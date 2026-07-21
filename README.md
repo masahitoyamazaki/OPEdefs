@@ -1,1 +1,194 @@
-# OPEdefs
+# pyOPEdefs
+
+A pure-Python / [SymPy](https://www.sympy.org) reimplementation of
+**OPEdefs 3.1**, Kris Thielemans' well-known Mathematica package for
+computing Operator Product Expansions of composite operators in
+meromorphic conformal field theory (chiral vertex algebras).
+
+Given the OPEs of a set of *basic* fields (generators), OPEs of arbitrarily
+complicated normal-ordered composites are computed automatically, and
+normal-ordered products are reduced to a canonical standard form. Both
+quantum OPEs and classical Poisson-bracket computations are supported.
+
+This is an independent reimplementation of the algorithms documented in:
+
+* K. Thielemans, *A Mathematica package for computing operator product
+  expansions*, Int. J. Mod. Phys. **C2** (1991) 787.
+* K. Thielemans, *An Algorithmic Approach to Operator Product Expansions,
+  W-Algebras and W-Strings*, PhD thesis, KU Leuven (1994),
+  [arXiv:hep-th/9506159](https://arxiv.org/abs/hep-th/9506159)
+  — in particular eqs. (3.3.1)–(3.3.19).
+
+Please cite these references when using this package in publications.
+All credit for the algorithm belongs to K. Thielemans.
+
+## Requirements
+
+Python ≥ 3.9 and `sympy` (`pip install sympy`). Single-file module: just put
+`opedefs.py` on your path.
+
+## Conventions
+
+An OPE is stored as its list of pole parts,
+
+```
+A(z) B(w) = Σ_{q=1}^{N}  [AB]_q(w) / (z-w)^q  +  regular ,
+```
+
+with `[AB]_0 = NO(A, B)` the point-splitting normal-ordered product,
+exactly as in the original. `define_ope` takes the poles from the
+**highest** order down to the **first** order pole (include zeros), i.e.
+the list form of `MakeOPE`. Coefficients may be arbitrary SymPy
+expressions (central charges, levels, …).
+
+## Quick start (Virasoro)
+
+```python
+import sympy as sp
+from opedefs import *
+
+c = sp.Symbol('c')
+T = bosonic('T')
+define_ope(T, T, [c/2*One, 0, 2*T, d(T)])       # OPE[T,T]=MakeOPE[{c/2 One,0,2T,T'}]
+
+OPE(T, T)
+# << 4|| (c/2)*One ||3|| 0 ||2|| 2*T ||1|| T' >>
+
+OPE(T, NO(T, T))
+# << 6|| 3*c*One ||5|| 0 ||4|| (c + 8)*T ||3|| 3*T' ||2|| 4*NO[T, T]
+#    ||1|| 1/6*T''' + 2*NO[T', T] >>
+
+Lam = NO(T, T) - sp.Rational(3, 10)*d(T, 2)     # quasiprimary
+OPE(T, Lam).simplify()
+# << 4|| (c + 22/5)*T ||3|| 0 ||2|| ... ||1|| ... >>   (poles 6, 5, 3 vanish)
+
+jacobi_satisfied(T, T, T)                        # -> True
+```
+
+## Correspondence with the Mathematica package
+
+| OPEdefs 3.1 (Mathematica)                     | pyOPEdefs                               |
+|-----------------------------------------------|-----------------------------------------|
+| `Bosonic[T, J]`                                | `T, J = bosonic('T', 'J')`              |
+| `Fermionic[psi]`                               | `psi = fermionic('psi')`                |
+| `One`                                          | `One`                                   |
+| `T'`, `Derivative[n][T]`                       | `d(T)`, `d(T, n)` / `T.d(n)`            |
+| `OPE[T,T] = MakeOPE[{c/2 One, 0, 2T, T'}]`     | `define_ope(T, T, [c/2*One, 0, 2*T, d(T)])` |
+| `OPE[A, B]`                                    | `OPE(A, B)` → `OPEData`                 |
+| `OPEPole[n][OPE[A,B]]`                         | `OPE(A, B).pole(n)`                     |
+| `OPEPole[n][A, B]` (incl. `n <= 0`)            | `OPEPole(n, A, B)`                      |
+| `NO[A, B, C]`                                  | `NO(A, B, C)`                           |
+| `MaxPole[ope]`                                 | `ope.max_pole` / `MaxPole(ope)`         |
+| `OPESimplify[expr, func]`                      | `OPESimplify(expr, func)` / `.simplify(func)` |
+| `OPEMap[f, ope]`                               | `ope.map(f)`                            |
+| `OPEJacobi[A, B, C]`                           | `OPEJacobi(A, B, C)`, `jacobi_satisfied(A, B, C)` |
+| `GetOperators` / `GetCoefficients`             | same names                              |
+| `OPEToSeries[ope]`                             | `ope.series_str()`                      |
+| `SetOPEOptions[OPEMethod, ClassicalOPEs]`      | `set_ope_options(method=CLASSICAL)`     |
+| `SetOPEOptions[NOOrdering, n]`                 | `set_ope_options(no_ordering=n)`        |
+| `ClearOPESavedValues[]`                        | `clear_caches()`                        |
+| reload the package                             | `reset()`                               |
+
+Operator expressions support natural arithmetic: `2*T + c*NO(J, J) - d(T)/3`.
+Ordering inside `NO` follows the original: normal ordering nests to the
+right, earlier-declared operators move left, higher derivatives left
+(default `no_ordering = -1`).
+
+## Indexed operator families, Delta and dummy sums
+
+The analogue of `Bosonic[J[_]]` with the `Delta`` package (and the dummy-index
+functionality of `Dummies``) is built in:
+
+```python
+k = sp.Symbol('k')
+a, i, j, l = idx('a i j l')                 # index symbols
+J = bosonic_family('J')                     # Bosonic[J[_]]
+define_ope(J(i), J(j),                      # OPE[J[i_],J[j_]] = MakeOPE[...]
+           [k/2*Delta(i, j)*One,
+            dsum(sp.I*Eps(i, j, l)*J(l), l, 3)])   # su(2): i eps_{ijl} J_l
+
+OPE(J(1), J(2))                             # << 1|| I*J(3) >>
+T = dsum(NO(J(a), J(a)), a, 3) / (k + 2)    # Sugawara; sum expanded (range 3)
+OPE(T, T).pole(4)                           # 3k/(2(k+2)) One  ->  c = 3k/(k+2)
+```
+
+Rules for indexed families:
+
+* An index which is a bare SymPy `Symbol` acts as a **pattern** inside
+  `define_ope` (the analogue of `i_`); it matches any index of the family.
+  Concrete indices (integers, etc.) define/override single components, and
+  mixed rules like `define_ope(T, phi(i), [h*phi(i), d(phi(i))])` work as
+  expected, including the automatic commutation for `OPE(phi(a), T)`.
+* `Delta = sympy.KroneckerDelta` is the symmetric Delta symbol
+  (`Delta(i, i) == 1`, `Delta(1, 2) == 0`), and `Eps = sympy.LeviCivita`.
+  Arbitrary SymPy functions can serve as structure constants.
+* `dsum(X, a, rng)` sums an expression over an index (cf. `SumDummy`).
+  With an integer or list `rng` the sum is expanded explicitly. With a
+  **symbolic** dimension `N` the sum is kept formal, and Kronecker deltas
+  are contracted automatically:
+  `sum_a Delta(a,b) X(a) = X(b)`, `sum_a Delta(a,a) = N`, and index-free
+  summands are multiplied by `N`. Free indices are assumed to lie in the
+  summation range. Dummy indices are renamed automatically (no
+  `NewDummies`/`Renumber` bookkeeping needed, and caching stays safe).
+
+With this, e.g. `N` free bosons give the Sugawara `c = N` fully symbolically,
+including the Jacobi identities:
+
+```python
+N = sp.Symbol('N', positive=True)
+J = bosonic_family('J'); i, j, a = idx('i j a')
+define_ope(J(i), J(j), [Delta(i, j)*One, 0])
+T = dsum(NO(J(a), J(a)), a, N) / 2
+OPE(T, T).pole(4)          # N/2 * One   ->  c = N
+jacobi_satisfied(T, T, T)  # True
+```
+
+## Validation
+
+`python test_opedefs.py` runs a suite checked against exactly known CFT
+results, all reproduced by the package:
+
+* Virasoro OPEs with derivative arguments, and the Jacobi identities.
+* Free-boson Sugawara `T = NO(J,J)/2` → `c = 1`; `OPE(J, T) = J/(z-w)^2`
+  exactly.
+* Free fermion `T = -NO(ψ, ∂ψ)/2` → `c = 1/2`; `NO(ψ, ψ) = 0`.
+* `bc` ghosts (λ = 2): weights `(2, -1)` and `c = -26`.
+* `su(2)_k` currents + Sugawara: `c = 3k/(k+2)`, with all Jacobi
+  identities.
+* `L₂:TT: = (8+c) T`, `L₁:TT: = 3∂T`, and the quasiprimary
+  `Λ = :TT: - 3/10 ∂²T`: `T·Λ` pole 4 equals `(5c+22)/5 · T`, poles 6, 5, 3
+  vanish.
+* `Λ·Λ` central term `c(5c+22)/10`, and pole 6 `= 4(5c+22)/5 · T`
+  (verified independently via the quasiprimary Ward identity).
+* N=1 super-Virasoro from free fields: `G = NO(J, ψ)` gives `c = 3/2`.
+* Classical (Poisson-bracket) mode: no central term for classical
+  Sugawara.
+* Indexed families: `su(2)_k` from a single pattern rule with Levi-Civita
+  structure constants reproduces `c = 3k/(k+2)`; `N` free bosons/fermions
+  with formal symbolic-`N` sums give `c = N` and `c = N/2` with all Jacobi
+  identities, Delta contractions, and `phi(z)T(w)` commutation from
+  pattern rules.
+
+## Differences / current limitations
+
+* Pattern-indexed operator families with the Delta symbol ARE supported
+  (`bosonic_family`, `define_ope` with Symbol indices, `Delta`, `dsum`);
+  see the section above. Formal (symbolic-dimension) sums assume free
+  indices lie in the summation range, and identities of user-supplied
+  structure constants (e.g. f-Jacobi identities) are not imposed
+  automatically -- the same convention as the Mathematica Dummies` workflow.
+* Symbolic (non-integer) parities (`OPEOperator[A, p]`) are not supported.
+* `OPESave` is unnecessary — pickle your own results if desired.
+  Intermediate results are cached in memory automatically
+  (the analogue of `OPESaving -> True`).
+* Performance: fine for typical W-algebra work at the scale of the
+  examples; the Mathematica original may still be faster on very large
+  computations. The single-pole shortcut rules (thesis eqs. (3.3.17),
+  (3.3.18) as *pole* extractors) are not separately implemented —
+  `OPEPole` computes the full (cached) OPE and extracts the pole.
+
+## Files
+
+* `opedefs.py` — the package (single module).
+* `test_opedefs.py` — validation suite (`python test_opedefs.py`).
+* `examples.py` — worked examples mirroring the original documentation.
