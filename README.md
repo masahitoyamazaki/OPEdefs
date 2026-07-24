@@ -145,8 +145,18 @@ jacobi_satisfied(T, T, T)  # True
 
 ## Validation
 
-`python test_opedefs.py` runs a suite checked against exactly known CFT
-results, all reproduced by the package:
+**Cross-checked directly against the original Mathematica OPEdefs 3.1
+(beta 4)**: `crosscheck/` contains a battery of 27 computations (110
+individually compared poles/operators -- Virasoro incl. `NO[T,T]` and the
+quasiprimary `Lambda`, free-boson Sugawara, free fermion, `bc` ghosts,
+`su(2)_k`, the N=2 superconformal algebra, and Zamolodchikov `W_3` with
+`beta = 16/(22+5c)`), run through both packages with `c`, `k` symbolic and
+compared after both sides are brought to canonical form. Confirmed
+**110/110 PASS** against the real Mathematica package (2026-07).
+See `crosscheck/README_crosscheck.md` to reproduce.
+
+`python test_opedefs.py` additionally runs a suite checked against exactly
+known CFT results, all reproduced by the package:
 
 * Virasoro OPEs with derivative arguments, and the Jacobi identities.
 * Free-boson Sugawara `T = NO(J,J)/2` → `c = 1`; `OPE(J, T) = J/(z-w)^2`
@@ -192,3 +202,6 @@ results, all reproduced by the package:
 * `opedefs.py` — the package (single module).
 * `test_opedefs.py` — validation suite (`python test_opedefs.py`).
 * `examples.py` — worked examples mirroring the original documentation.
+* `crosscheck/` — battery to cross-check results against the original
+  Mathematica OPEdefs (`mma_crosscheck.wls` + `py_crosscheck.py`); see
+  `crosscheck/README_crosscheck.md`.
