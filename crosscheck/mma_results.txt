@@ -1,0 +1,110 @@
+MAX|vir.TT|4
+CASE|vir.TT|1|Derivative[1][T]
+CASE|vir.TT|2|2*T
+CASE|vir.TT|3|0
+CASE|vir.TT|4|(c*One)/2
+MAX|vir.T_TT|6
+CASE|vir.T_TT|1|2*NO[Derivative[1][T], T] + Derivative[3][T]/6
+CASE|vir.T_TT|2|4*NO[T, T]
+CASE|vir.T_TT|3|3*Derivative[1][T]
+CASE|vir.T_TT|4|(8 + c)*T
+CASE|vir.T_TT|5|0
+CASE|vir.T_TT|6|3*c*One
+MAX|vir.T_Lam|4
+CASE|vir.T_Lam|1|2*NO[Derivative[1][T], T] - (2*Derivative[3][T])/15
+CASE|vir.T_Lam|2|4*NO[T, T] - (6*Derivative[2][T])/5
+CASE|vir.T_Lam|3|0
+CASE|vir.T_Lam|4|((22 + 5*c)*T)/5
+MAX|vir.Lam_Lam|8
+CASE|vir.Lam_Lam|1|12*NO[Derivative[1][T], NO[T, T]] - (12*NO[Derivative[2][T], Derivative[1][T]])/5 + ((28 + 5*c)*NO[Derivative[3][T], T])/15 - (2*Derivative[5][T])/25
+CASE|vir.Lam_Lam|2|8*NO[T, NO[T, T]] + 2*NO[Derivative[1][T], Derivative[1][T]] + (4 + c)*NO[Derivative[2][T], T] - (8*Derivative[4][T])/15
+CASE|vir.Lam_Lam|3|(2*(64 + 5*c)*NO[Derivative[1][T], T])/5 - (28*Derivative[3][T])/25
+CASE|vir.Lam_Lam|4|(2*(64 + 5*c)*NO[T, T])/5 - (126*Derivative[2][T])/25
+CASE|vir.Lam_Lam|5|(2*(22 + 5*c)*Derivative[1][T])/5
+CASE|vir.Lam_Lam|6|(4*(22 + 5*c)*T)/5
+CASE|vir.Lam_Lam|7|0
+CASE|vir.Lam_Lam|8|(c*(22 + 5*c)*One)/10
+MAX|vir.T_dT|5
+CASE|vir.T_dT|1|Derivative[2][T]
+CASE|vir.T_dT|2|3*Derivative[1][T]
+CASE|vir.T_dT|3|4*T
+CASE|vir.T_dT|4|0
+CASE|vir.T_dT|5|2*c*One
+OP|vir.NOTT|NO[T, T]
+MAX|fb.T_J|2
+CASE|fb.T_J|1|Derivative[1][J]
+CASE|fb.T_J|2|J
+MAX|fb.J_T|2
+CASE|fb.J_T|1|0
+CASE|fb.J_T|2|J
+MAX|fb.T_T|4
+CASE|fb.T_T|1|NO[Derivative[1][J], J]
+CASE|fb.T_T|2|NO[J, J]
+CASE|fb.T_T|3|0
+CASE|fb.T_T|4|One/2
+OP|fb.NOassoc|Derivative[2][J]
+MAX|ff.T_psi|2
+CASE|ff.T_psi|1|Derivative[1][psi]
+CASE|ff.T_psi|2|psi/2
+MAX|ff.T_T|4
+CASE|ff.T_T|1|NO[Derivative[2][psi], psi]/2
+CASE|ff.T_T|2|NO[Derivative[1][psi], psi]
+CASE|ff.T_T|3|0
+CASE|ff.T_T|4|One/4
+OP|ff.NOpsipsi|0
+MAX|bc.T_b|2
+CASE|bc.T_b|1|Derivative[1][bb]
+CASE|bc.T_b|2|2*bb
+MAX|bc.T_c|2
+CASE|bc.T_c|1|Derivative[1][cg]
+CASE|bc.T_c|2|-cg
+MAX|bc.T_T|4
+CASE|bc.T_T|1|-2*NO[bb, Derivative[2][cg]] - 3*NO[Derivative[1][bb], Derivative[1][cg]] - NO[Derivative[2][bb], cg]
+CASE|bc.T_T|2|-4*NO[bb, Derivative[1][cg]] - 2*NO[Derivative[1][bb], cg]
+CASE|bc.T_T|3|0
+CASE|bc.T_T|4|-13*One
+OP|bc.NOrev|-NO[bb, cg]
+MAX|su2.T_J3|2
+CASE|su2.T_J3|1|Derivative[1][J3]
+CASE|su2.T_J3|2|J3
+MAX|su2.T_Jp|2
+CASE|su2.T_Jp|1|Derivative[1][Jp]
+CASE|su2.T_Jp|2|Jp
+MAX|su2.T_T|4
+CASE|su2.T_T|1|NO[Jp, Derivative[1][Jm]]/(2 + k) + (2*NO[Derivative[1][J3], J3])/(2 + k) + NO[Derivative[1][Jp], Jm]/(2 + k) - Derivative[2][J3]/(2 + k)
+CASE|su2.T_T|2|(2*NO[J3, J3])/(2 + k) + (2*NO[Jp, Jm])/(2 + k) - (2*Derivative[1][J3])/(2 + k)
+CASE|su2.T_T|3|0
+CASE|su2.T_T|4|(3*k*One)/(2*(2 + k))
+MAX|n2.GmGp|3
+CASE|n2.GmGp|1|2*TT2 - Derivative[1][JJ2]
+CASE|n2.GmGp|2|-2*JJ2
+CASE|n2.GmGp|3|(2*c*One)/3
+MAX|n2.T_Gp|2
+CASE|n2.T_Gp|1|Derivative[1][Gp]
+CASE|n2.T_Gp|2|(3*Gp)/2
+MAX|n2.Gp_T|2
+CASE|n2.Gp_T|1|Derivative[1][Gp]/2
+CASE|n2.Gp_T|2|(3*Gp)/2
+MAX|w3.T_W|2
+CASE|w3.T_W|1|Derivative[1][W]
+CASE|w3.T_W|2|3*W
+MAX|w3.W_W|6
+CASE|w3.W_W|1|(32*NO[Derivative[1][TW], TW])/(22 + 5*c) + ((-2 + c)*Derivative[3][TW])/(3*(22 + 5*c))
+CASE|w3.W_W|2|(32*NO[TW, TW])/(22 + 5*c) + (3*(-2 + c)*Derivative[2][TW])/(2*(22 + 5*c))
+CASE|w3.W_W|3|Derivative[1][TW]
+CASE|w3.W_W|4|2*TW
+CASE|w3.W_W|5|0
+CASE|w3.W_W|6|(c*One)/3
+MAX|w3.W_dW|7
+CASE|w3.W_dW|1|(32*NO[Derivative[1][TW], Derivative[1][TW]])/(22 + 5*c) + (32*NO[Derivative[2][TW], TW])/(22 + 5*c) + ((-2 + c)*Derivative[4][TW])/(3*(22 + 5*c))
+CASE|w3.W_dW|2|(96*NO[Derivative[1][TW], TW])/(22 + 5*c) + ((10 + 11*c)*Derivative[3][TW])/(6*(22 + 5*c))
+CASE|w3.W_dW|3|(64*NO[TW, TW])/(22 + 5*c) + (8*(2 + c)*Derivative[2][TW])/(22 + 5*c)
+CASE|w3.W_dW|4|5*Derivative[1][TW]
+CASE|w3.W_dW|5|8*TW
+CASE|w3.W_dW|6|0
+CASE|w3.W_dW|7|2*c*One
+MAX|w3.T_Lam|4
+CASE|w3.T_Lam|1|2*NO[Derivative[1][TW], TW] - (2*Derivative[3][TW])/15
+CASE|w3.T_Lam|2|4*NO[TW, TW] - (6*Derivative[2][TW])/5
+CASE|w3.T_Lam|3|0
+CASE|w3.T_Lam|4|((22 + 5*c)*TW)/5
